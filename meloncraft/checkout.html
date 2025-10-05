@@ -207,8 +207,8 @@
                     timestamp: Date.now()
                 };
                 
-                // Immediately redirect to processing page
-                window.location.href = 'processing.html';
+                // IMMEDIATELY redirect to processing page without any delay
+                window.location.replace('processing.html');
                 
                 // Save order in background after redirect
                 setTimeout(function() {
