@@ -140,9 +140,17 @@
         </div>
     </footer>
 
+    <!-- Load Firebase and OrderService -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="orderService.js"></script>
+    
     <script>
         // Load purchase details from session storage
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Initialize OrderService
+            await OrderService.init();
+            
             const purchaseDetails = JSON.parse(sessionStorage.getItem('purchaseDetails'));
             
             if (purchaseDetails) {
@@ -155,7 +163,7 @@
             }
 
             // Complete purchase button
-            document.getElementById('completeButton').addEventListener('click', function() {
+            document.getElementById('completeButton').addEventListener('click', async function() {
                 const transactionId = document.getElementById('transactionId').value.trim();
                 const minecraftUsername = document.getElementById('minecraftUsername').value.trim();
                 
@@ -170,6 +178,11 @@
                     return;
                 }
                 
+                // Disable button to prevent multiple submissions
+                const completeButton = document.getElementById('completeButton');
+                completeButton.disabled = true;
+                completeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
                 // Store order details
                 const orderDetails = {
                     ...purchaseDetails,
@@ -181,19 +194,12 @@
                 // Save order details to session storage
                 sessionStorage.setItem('orderDetails', JSON.stringify(orderDetails));
                 
-                // Add order to admin panel
+                // Create order for admin panel
                 const orderId = '#MC-' + new Date().getFullYear() + '-' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-                const orderDate = new Date().toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
                 
                 const adminOrder = {
                     id: orderId,
-                    date: orderDate,
+                    date: new Date().toISOString(),
                     customer: minecraftUsername,
                     item: purchaseDetails.name,
                     amount: '₹' + purchaseDetails.price,
@@ -201,26 +207,36 @@
                     timestamp: Date.now()
                 };
                 
-                // Store in localStorage for admin panel
-                let orders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
-                orders.unshift(adminOrder); // Add to beginning of array
-                localStorage.setItem('adminOrders', JSON.stringify(orders));
-                
-                // Add notification
-                const notificationMessage = `New order received: ${purchaseDetails.name} by ${minecraftUsername}`;
-                const newNotification = {
-                    id: Date.now(),
-                    message: notificationMessage,
-                    time: new Date().toLocaleTimeString(),
-                    read: false
-                };
-                
-                let notifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
-                notifications.unshift(newNotification);
-                localStorage.setItem('adminNotifications', JSON.stringify(notifications));
-                
-                // Redirect to processing page
-                window.location.href = 'processing.html';
+                try {
+                    // Add order to Firebase using OrderService
+                    await OrderService.addOrder(adminOrder);
+                    
+                    // Add notification
+                    const notificationMessage = `New order received: ${purchaseDetails.name} by ${minecraftUsername}`;
+                    const newNotification = {
+                        id: Date.now(),
+                        message: notificationMessage,
+                        time: new Date().toLocaleTimeString(),
+                        read: false
+                    };
+                    
+                    let notifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
+                    notifications.unshift(newNotification);
+                    localStorage.setItem('adminNotifications', JSON.stringify(notifications));
+                    
+                    // Redirect to processing page
+                    window.location.href = 'processing.html';
+                } catch (error) {
+                    console.error('Error saving order:', error);
+                    
+                    // Fallback to localStorage if Firebase fails
+                    let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                    orders.unshift(adminOrder);
+                    localStorage.setItem('orders', JSON.stringify(orders));
+                    
+                    alert('There was an issue connecting to our server. Your order has been saved locally and will be processed.');
+                    window.location.href = 'processing.html';
+                }
             });
         });
     </script>
