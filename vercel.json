@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "meloncraft",
+  "builds": [
+    { "src": "dark-mc.netlify.app/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/dark-mc.netlify.app/$1" }
+  ]
+}

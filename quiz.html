@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MelonCraft Quiz & Feedback - Ultimate Minecraft Server Shop</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            color: #f0f0f0;
+        }
+        
+        .quiz-container {
+            max-width: 800px;
+            margin: 100px auto 50px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .quiz-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: #2ecc71;
+            text-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .quiz-subtitle {
+            color: #a0a0a0;
+            font-size: 1.1rem;
+        }
+        
+        .question-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .question-card:hover {
+            border-color: rgba(46, 204, 113, 0.5);
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.1);
+        }
+        
+        .question-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #2ecc71;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+        
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #f0f0f0;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option:hover {
+            background: rgba(46, 204, 113, 0.1);
+            border-color: rgba(46, 204, 113, 0.3);
+        }
+        
+        .option input[type="radio"] {
+            margin-right: 15px;
+            accent-color: #2ecc71;
+        }
+        
+        .star-rating {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .star {
+            font-size: 2rem;
+            color: #444;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .star:hover,
+        .star.active {
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .submit-btn {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 40px auto 0;
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.3);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(46, 204, 113, 0.4);
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #2ecc71;
+            border-radius: 50%;
+            animation: float 6s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #2ecc71, transparent);
+            margin: 40px 0;
+            border-radius: 1px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <img src="img/logo.png" alt="MelonCraft" class="logo">
+                    <span class="logo-text">MelonCraft</span>
+                </div>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#store" class="nav-link">Store</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="quiz.html" class="nav-link active">Quiz</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#about" class="nav-link">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#contact" class="nav-link">Contact</a>
+                    </li>
+                </ul>
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Particles Background -->
+    <div class="particles"></div>
+
+    <!-- Quiz Container -->
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1 class="quiz-title">🍉 MelonCraft Quiz & Feedback</h1>
+            <p class="quiz-subtitle">Test your Minecraft knowledge and help us improve!</p>
+        </div>
+
+        <form id="quizForm">
+            <!-- Minecraft Quiz Questions -->
+            <div class="question-card">
+                <h3 class="question-title">Question 1</h3>
+                <p class="question-text">What is the maximum level for enchantments in Minecraft?</p>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="q1" value="a">
+                        Level 30
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q1" value="b">
+                        Level 50
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q1" value="c">
+                        Level 100
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q1" value="d">
+                        No limit
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3 class="question-title">Question 2</h3>
+                <p class="question-text">Which dimension contains the End Cities?</p>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="q2" value="a">
+                        Overworld
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q2" value="b">
+                        Nether
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q2" value="c">
+                        The End
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q2" value="d">
+                        Aether
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3 class="question-title">Question 3</h3>
+                <p class="question-text">What material is needed to craft a beacon?</p>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="q3" value="a">
+                        Diamond
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3" value="b">
+                        Nether Star
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3" value="c">
+                        Emerald
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3" value="d">
+                        Gold
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3 class="question-title">Question 4</h3>
+                <p class="question-text">How many eyes of ender are needed to activate an End Portal?</p>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="q4" value="a">
+                        9
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4" value="b">
+                        12
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4" value="c">
+                        15
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4" value="d">
+                        16
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3 class="question-title">Question 5</h3>
+                <p class="question-text">Which mob drops blaze rods?</p>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="q5" value="a">
+                        Blaze
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q5" value="b">
+                        Wither Skeleton
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q5" value="c">
+                        Ghast
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q5" value="d">
+                        Magma Cube
+                    </label>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- Website Feedback Questions -->
+            <div class="question-card">
+                <h3 class="question-title">Feedback 1</h3>
+                <p class="question-text">How would you rate the overall design of our website?</p>
+                <div class="star-rating" data-rating="feedback1">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3 class="question-title">Feedback 2</h3>
+                <p class="question-text">How easy is it to navigate our website?</p>
+                <div class="star-rating" data-rating="feedback2">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3 class="question-title">Feedback 3</h3>
+                <p class="question-text">How likely are you to recommend MelonCraft to friends?</p>
+                <div class="star-rating" data-rating="feedback3">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3 class="question-title">Feedback 4</h3>
+                <p class="question-text">How satisfied are you with our product offerings?</p>
+                <div class="star-rating" data-rating="feedback4">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3 class="question-title">Feedback 5</h3>
+                <p class="question-text">How would you rate the loading speed of our website?</p>
+                <div class="star-rating" data-rating="feedback5">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-paper-plane"></i> Submit Quiz & Feedback
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Particles animation
+        function createParticles() {
+            const particlesContainer = document.querySelector('.particles');
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Star rating functionality
+        document.querySelectorAll('.star-rating').forEach(rating => {
+            const stars = rating.querySelectorAll('.star');
+            
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    const ratingValue = index + 1;
+                    rating.setAttribute('data-value', ratingValue);
+                    
+                    stars.forEach((s, i) => {
+                        if (i < ratingValue) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                });
+                
+                star.addEventListener('mouseover', () => {
+                    stars.forEach((s, i) => {
+                        if (i <= index) {
+                            s.style.color = '#ffd700';
+                        } else {
+                            s.style.color = '#444';
+                        }
+                    });
+                });
+            });
+            
+            rating.addEventListener('mouseleave', () => {
+                const currentRating = rating.getAttribute('data-value') || 0;
+                stars.forEach((s, i) => {
+                    if (i < currentRating) {
+                        s.style.color = '#ffd700';
+                    } else {
+                        s.style.color = '#444';
+                    }
+                });
+            });
+        });
+
+        // Form submission
+        document.getElementById('quizForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Create confetti effect
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '-10px';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = ['#2ecc71', '#e74c3c', '#f39c12', '#3498db'][Math.floor(Math.random() * 4)];
+                confetti.style.zIndex = '9999';
+                confetti.style.animation = 'confetti 3s linear forwards';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 3000);
+            }
+            
+            alert('Thank you for completing the MelonCraft Quiz & Feedback! 🍉');
+        });
+
+        // Mobile menu toggle
+        document.querySelector('.hamburger').addEventListener('click', function() {
+            document.querySelector('.nav-menu').classList.toggle('active');
+        });
+
+        // Initialize particles
+        createParticles();
+
+        // Add confetti animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes confetti {
+                0% {
+                    transform: translateY(-10px) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(100vh) rotate(720deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

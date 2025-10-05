@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MelonCraft</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Security Meta Tags -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;">
+    <meta name="referrer" content="no-referrer">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+</head>
+<body class="admin-page">
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="admin-brand">
+                <i class="fas fa-shield-alt"></i>
+                <span>MelonCraft Admin</span>
+            </div>
+            <ul class="admin-menu">
+                <li class="active" id="dashboard-link">
+                    <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                </li>
+                <li id="orders-link">
+                    <a href="#"><i class="fas fa-shopping-cart"></i> Orders</a>
+                </li>
+                <li id="settings-link">
+                    <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                </li>
+            </ul>
+            <div class="admin-logout">
+                <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="admin-content">
+            <!-- Header -->
+            <div class="admin-header">
+                <div class="admin-title">
+                    <h1>Dashboard</h1>
+                </div>
+                <div class="admin-notifications">
+                    <div class="notification-icon" id="notification-icon">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notification-count">0</span>
+                    </div>
+                    <div class="notification-dropdown" id="notification-dropdown">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <button id="mark-all-read">Mark all as read</button>
+                        </div>
+                        <div class="notification-list" id="notification-list">
+                            <div class="empty-notification">No new notifications</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="admin-dashboard" id="dashboard-content">
+                <!-- Stats Cards -->
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Orders</h3>
+                            <p id="total-orders">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Revenue</h3>
+                            <p id="total-revenue">$0.00</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Customers</h3>
+                            <p id="total-customers">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="orders-container">
+                    <div class="orders-header">
+                        <h2>Recent Orders</h2>
+                        <div class="orders-actions">
+                            <button id="refresh-orders"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
+                    </div>
+                    <div class="orders-table-container">
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Item</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body">
+                                <!-- Orders will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Orders Page Content -->
+            <div class="admin-orders" id="orders-content" style="display: none;">
+                <div class="page-header">
+                    <h2>All Orders</h2>
+                    <div class="filter-controls">
+                        <select id="order-status-filter">
+                            <option value="all">All Statuses</option>
+                            <option value="completed">Completed</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                        <button id="clear-filters"><i class="fas fa-times"></i> Clear Filters</button>
+                    </div>
+                </div>
+                <div class="orders-table-container">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Item</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="all-orders-table-body">
+                            <!-- All orders will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Settings Page Content -->
+            <div class="admin-settings" id="settings-content" style="display: none;">
+                <div class="page-header">
+                    <h2>Admin Settings</h2>
+                </div>
+                <div class="settings-container">
+                    <div class="settings-card">
+                        <h3>Account Settings</h3>
+                        <form id="account-settings-form">
+                            <div class="form-group">
+                                <label for="admin-username">Username</label>
+                                <input type="text" id="admin-username" value="admin" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for="admin-password">Change Password</label>
+                                <input type="password" id="admin-password" placeholder="New Password">
+                            </div>
+                            <div class="form-group">
+                                <label for="admin-password-confirm">Confirm Password</label>
+                                <input type="password" id="admin-password-confirm" placeholder="Confirm Password">
+                            </div>
+                            <button type="submit" class="btn-primary">Save Changes</button>
+                        </form>
+                    </div>
+                    <div class="settings-card">
+                        <h3>Notification Settings</h3>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="enable-notifications" checked>
+                                Enable Order Notifications
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="enable-sound" checked>
+                                Enable Notification Sounds
+                            </label>
+                        </div>
+                        <button id="save-notification-settings" class="btn-primary">Save Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if admin is logged in
+            if (!sessionStorage.getItem('adminLoggedIn')) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+
+            // DOM Elements
+            const logoutBtn = document.getElementById('logout-btn');
+            const notificationIcon = document.getElementById('notification-icon');
+            const notificationDropdown = document.getElementById('notification-dropdown');
+            const notificationList = document.getElementById('notification-list');
+            const notificationCount = document.getElementById('notification-count');
+            const markAllReadBtn = document.getElementById('mark-all-read');
+            const refreshOrdersBtn = document.getElementById('refresh-orders');
+            const ordersTableBody = document.getElementById('orders-table-body');
+            const totalOrdersEl = document.getElementById('total-orders');
+            const totalRevenueEl = document.getElementById('total-revenue');
+            const totalCustomersEl = document.getElementById('total-customers');
+
+            // Logout functionality
+            logoutBtn.addEventListener('click', function() {
+                sessionStorage.removeItem('adminLoggedIn');
+                window.location.href = 'admin-login.html';
+            });
+
+            // Toggle notification dropdown
+            notificationIcon.addEventListener('click', function() {
+                notificationDropdown.classList.toggle('show');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!notificationIcon.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                    notificationDropdown.classList.remove('show');
+                }
+            });
+
+            // Mark all notifications as read
+            markAllReadBtn.addEventListener('click', function() {
+                const notifications = document.querySelectorAll('.notification-item');
+                notifications.forEach(notification => {
+                    notification.classList.remove('unread');
+                });
+                updateNotificationCount();
+                
+                // Update localStorage
+                const storedNotifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
+                storedNotifications.forEach(notification => {
+                    notification.read = true;
+                });
+                localStorage.setItem('adminNotifications', JSON.stringify(storedNotifications));
+            });
+
+            // Refresh orders
+            refreshOrdersBtn.addEventListener('click', loadOrders);
+
+            // Load orders from localStorage
+            function loadOrders() {
+                const orders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
+                
+                // Update stats
+                totalOrdersEl.textContent = orders.length;
+                
+                // Use the updateRevenue function to calculate and display revenue
+                updateRevenue(orders);
+                
+                // Count unique customers
+                const customers = new Set(orders.map(order => order.customer));
+                totalCustomersEl.textContent = customers.size;
+                
+                // Clear table
+                ordersTableBody.innerHTML = '';
+                
+                if (orders.length === 0) {
+                    const emptyRow = document.createElement('tr');
+                    emptyRow.innerHTML = `
+                        <td colspan="7" class="empty-table">No orders found</td>
+                    `;
+                    ordersTableBody.appendChild(emptyRow);
+                    return;
+                }
+                
+                // Add orders to table
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${order.id}</td>
+                        <td>${order.date}</td>
+                        <td>${order.customer}</td>
+                        <td>${order.item}</td>
+                        <td>${order.amount}</td>
+                        <td>
+                            <select class="status-select" data-id="${order.id}">
+                                <option value="pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                <option value="rejected" ${order.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="action-btn view-btn" data-id="${order.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    `;
+                    ordersTableBody.appendChild(row);
+                });
+                
+                // Add event listeners to view buttons
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const orderId = this.getAttribute('data-id');
+                        alert(`Viewing order ${orderId}`);
+                        // In a real app, this would open a modal with order details
+                    });
+                });
+                
+                // Add event listeners to status selects
+                document.querySelectorAll('.status-select').forEach(select => {
+                    select.addEventListener('change', function() {
+                        const orderId = this.getAttribute('data-id');
+                        const newStatus = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+                        
+                        // Update order in localStorage
+                        const orders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
+                        const orderIndex = orders.findIndex(order => order.id === orderId);
+                        
+                        if (orderIndex !== -1) {
+                            orders[orderIndex].status = newStatus;
+                            localStorage.setItem('adminOrders', JSON.stringify(orders));
+                            
+                            // Add notification about status change
+                            addNotification(`Order #${orderId} status changed to ${newStatus}`);
+                            
+                            // Recalculate revenue immediately
+                            updateRevenue(orders);
+                        }
+                    });
+                });
+                
+                // Function to update revenue display
+                function updateRevenue(orders) {
+                    const revenue = orders.reduce((total, order) => {
+                        if (order.status === 'Completed') {
+                            // Handle both $ and ₹ currency symbols
+                            const amountStr = order.amount.replace('$', '').replace('₹', '');
+                            const amount = parseFloat(amountStr);
+                            if (!isNaN(amount)) {
+                                return total + amount;
+                            }
+                        }
+                        return total;
+                    }, 0);
+                    totalRevenueEl.textContent = `₹${revenue.toFixed(2)}`;
+                }
+            }
+
+            // Load notifications from localStorage
+            function loadNotifications() {
+                const notifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
+                
+                notificationList.innerHTML = '';
+                
+                if (notifications.length === 0) {
+                    notificationList.innerHTML = '<div class="empty-notification">No new notifications</div>';
+                    return;
+                }
+                
+                notifications.forEach(notification => {
+                    const notificationItem = document.createElement('div');
+                    notificationItem.className = `notification-item ${notification.read ? '' : 'unread'}`;
+                    notificationItem.innerHTML = `
+                        <div class="notification-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p>${notification.message}</p>
+                            <span class="notification-time">${notification.time}</span>
+                        </div>
+                    `;
+                    notificationList.appendChild(notificationItem);
+                    
+                    // Mark as read when clicked
+                    notificationItem.addEventListener('click', function() {
+                        this.classList.remove('unread');
+                        notification.read = true;
+                        localStorage.setItem('adminNotifications', JSON.stringify(notifications));
+                        updateNotificationCount();
+                    });
+                });
+                
+                updateNotificationCount();
+            }
+
+            // Update notification count
+            function updateNotificationCount() {
+                const notifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
+                const unreadCount = notifications.filter(notification => !notification.read).length;
+                
+                notificationCount.textContent = unreadCount;
+                
+                if (unreadCount > 0) {
+                    notificationCount.classList.add('show');
+                } else {
+                    notificationCount.classList.remove('show');
+                }
+            }
+
+            // Add a new notification
+            function addNotification(message) {
+                const notifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
+                
+                const newNotification = {
+                    id: Date.now(),
+                    message: message,
+                    time: new Date().toLocaleTimeString(),
+                    read: false
+                };
+                
+                notifications.unshift(newNotification);
+                localStorage.setItem('adminNotifications', JSON.stringify(notifications));
+                
+                loadNotifications();
+                
+                // Show notification alert
+                const alert = document.createElement('div');
+                alert.className = 'notification-alert';
+                alert.innerHTML = `
+                    <i class="fas fa-bell"></i>
+                    <span>${message}</span>
+                `;
+                document.body.appendChild(alert);
+                
+                setTimeout(() => {
+                    alert.classList.add('show');
+                }, 100);
+                
+                setTimeout(() => {
+                    alert.classList.remove('show');
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 300);
+                }, 5000);
+            }
+
+            // Check for new orders every 10 seconds
+            function checkForNewOrders() {
+                const lastCheck = localStorage.getItem('lastOrderCheck') || '0';
+                const orders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
+                
+                if (orders.length > 0) {
+                    const latestOrderTime = new Date(orders[0].timestamp || 0).getTime();
+                    
+                    if (latestOrderTime > parseInt(lastCheck)) {
+                        // New order found
+                        addNotification(`New order received: ${orders[0].id}`);
+                        localStorage.setItem('lastOrderCheck', latestOrderTime.toString());
+                    }
+                }
+                
+                // Initial check
+                if (lastCheck === '0' && orders.length > 0) {
+                    localStorage.setItem('lastOrderCheck', Date.now().toString());
+                }
+            }
+
+            // Navigation functionality
+            const dashboardLink = document.getElementById('dashboard-link');
+            const ordersLink = document.getElementById('orders-link');
+            const settingsLink = document.getElementById('settings-link');
+            
+            const dashboardContent = document.getElementById('dashboard-content');
+            const ordersContent = document.getElementById('orders-content');
+            const settingsContent = document.getElementById('settings-content');
+            
+            // Dashboard link
+            dashboardLink.addEventListener('click', function() {
+                dashboardContent.style.display = 'block';
+                ordersContent.style.display = 'none';
+                settingsContent.style.display = 'none';
+                
+                dashboardLink.classList.add('active');
+                ordersLink.classList.remove('active');
+                settingsLink.classList.remove('active');
+                
+                document.querySelector('.admin-header h1').textContent = 'Dashboard';
+                loadOrders();
+            });
+            
+            // Orders link
+            ordersLink.addEventListener('click', function() {
+                dashboardContent.style.display = 'none';
+                ordersContent.style.display = 'block';
+                settingsContent.style.display = 'none';
+                
+                dashboardLink.classList.remove('active');
+                ordersLink.classList.add('active');
+                settingsLink.classList.remove('active');
+                
+                document.querySelector('.admin-header h1').textContent = 'Orders';
+                loadAllOrders();
+            });
+            
+            // Settings link
+            settingsLink.addEventListener('click', function() {
+                dashboardContent.style.display = 'none';
+                ordersContent.style.display = 'none';
+                settingsContent.style.display = 'block';
+                
+                dashboardLink.classList.remove('active');
+                ordersLink.classList.remove('active');
+                settingsLink.classList.add('active');
+                
+                document.querySelector('.admin-header h1').textContent = 'Settings';
+            });
+            
+            // Load all orders for the orders page
+            function loadAllOrders() {
+                const orders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
+                const allOrdersTableBody = document.getElementById('all-orders-table-body');
+                
+                // Clear table
+                allOrdersTableBody.innerHTML = '';
+                
+                if (orders.length === 0) {
+                    const emptyRow = document.createElement('tr');
+                    emptyRow.innerHTML = `
+                        <td colspan="7" class="empty-table">No orders found</td>
+                    `;
+                    allOrdersTableBody.appendChild(emptyRow);
+                    return;
+                }
+                
+                // Add orders to table
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${order.id}</td>
+                        <td>${order.date}</td>
+                        <td>${order.customer}</td>
+                        <td>${order.item}</td>
+                        <td>${order.amount}</td>
+                        <td><span class="status-badge ${order.status.toLowerCase()}">${order.status}</span></td>
+                        <td>
+                            <button class="action-btn view-btn" data-id="${order.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn delete-btn" data-id="${order.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    allOrdersTableBody.appendChild(row);
+                });
+                
+                // Add event listeners to buttons
+                document.querySelectorAll('#all-orders-table-body .view-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const orderId = this.getAttribute('data-id');
+                        alert(`Viewing order ${orderId}`);
+                    });
+                });
+                
+                document.querySelectorAll('#all-orders-table-body .delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const orderId = this.getAttribute('data-id');
+                        if (confirm(`Are you sure you want to delete order ${orderId}?`)) {
+                            deleteOrder(orderId);
+                        }
+                    });
+                });
+            }
+            
+            // Delete an order
+            function deleteOrder(orderId) {
+                const orders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
+                const updatedOrders = orders.filter(order => order.id !== orderId);
+                localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
+                
+                // Reload orders
+                loadAllOrders();
+                loadOrders();
+                
+                // Show notification
+                addNotification(`Order ${orderId} has been deleted`);
+            }
+            
+            // Handle order status filter
+            document.getElementById('order-status-filter').addEventListener('change', function() {
+                const status = this.value;
+                const orders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
+                const allOrdersTableBody = document.getElementById('all-orders-table-body');
+                
+                // Clear table
+                allOrdersTableBody.innerHTML = '';
+                
+                // Filter orders
+                const filteredOrders = status === 'all' ? orders : orders.filter(order => order.status.toLowerCase() === status);
+                
+                if (filteredOrders.length === 0) {
+                    const emptyRow = document.createElement('tr');
+                    emptyRow.innerHTML = `
+                        <td colspan="7" class="empty-table">No orders found</td>
+                    `;
+                    allOrdersTableBody.appendChild(emptyRow);
+                    return;
+                }
+                
+                // Add filtered orders to table
+                filteredOrders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${order.id}</td>
+                        <td>${order.date}</td>
+                        <td>${order.customer}</td>
+                        <td>${order.item}</td>
+                        <td>${order.amount}</td>
+                        <td><span class="status-badge ${order.status.toLowerCase()}">${order.status}</span></td>
+                        <td>
+                            <button class="action-btn view-btn" data-id="${order.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn delete-btn" data-id="${order.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    allOrdersTableBody.appendChild(row);
+                });
+            });
+            
+            // Clear filters
+            document.getElementById('clear-filters').addEventListener('click', function() {
+                document.getElementById('order-status-filter').value = 'all';
+                loadAllOrders();
+            });
+            
+            // Handle settings form submission
+            document.getElementById('account-settings-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const password = document.getElementById('admin-password').value;
+                const confirmPassword = document.getElementById('admin-password-confirm').value;
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+                
+                if (password.length < 8) {
+                    alert('Password must be at least 8 characters long');
+                    return;
+                }
+                
+                // In a real app, this would update the password in a secure way
+                alert('Password updated successfully');
+                
+                // Clear form
+                document.getElementById('admin-password').value = '';
+                document.getElementById('admin-password-confirm').value = '';
+            });
+            
+            // Handle notification settings
+            document.getElementById('save-notification-settings').addEventListener('click', function() {
+                const enableNotifications = document.getElementById('enable-notifications').checked;
+                const enableSound = document.getElementById('enable-sound').checked;
+                
+                // Save settings to localStorage
+                localStorage.setItem('adminNotificationSettings', JSON.stringify({
+                    enableNotifications,
+                    enableSound
+                }));
+                
+                alert('Notification settings saved');
+            });
+            
+            // Load notification settings
+            const notificationSettings = JSON.parse(localStorage.getItem('adminNotificationSettings') || '{"enableNotifications":true,"enableSound":true}');
+            document.getElementById('enable-notifications').checked = notificationSettings.enableNotifications;
+            document.getElementById('enable-sound').checked = notificationSettings.enableSound;
+            
+            // Initialize
+            loadOrders();
+            loadNotifications();
+            checkForNewOrders();
+            
+            // Set up polling for new orders
+            setInterval(checkForNewOrders, 10000);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
