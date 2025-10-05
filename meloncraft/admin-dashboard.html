@@ -299,10 +299,14 @@
                     }
                     
                     // Get orders from Firebase
-                    const orders = await OrderService.getAllOrders();
+                    const response = await OrderService.getAllOrders();
                     
-                    // Update dashboard with orders
-                    updateDashboard(orders);
+                    if (response.success && response.orders) {
+                        // Update dashboard with orders
+                        updateDashboard(response.orders);
+                    } else {
+                        throw new Error('Failed to fetch orders');
+                    }
                 } catch (error) {
                     console.error('Error loading orders:', error);
                     
