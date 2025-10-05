@@ -163,7 +163,7 @@
             }
 
             // Complete purchase button
-            document.getElementById('completeButton').addEventListener('click', async function() {
+            document.getElementById('completeButton').addEventListener('click', function() {
                 const transactionId = document.getElementById('transactionId').value.trim();
                 const minecraftUsername = document.getElementById('minecraftUsername').value.trim();
                 
@@ -207,9 +207,20 @@
                     timestamp: Date.now()
                 };
                 
-                try {
-                    // Add order to Firebase using OrderService
-                    await OrderService.addOrder(adminOrder);
+                // Immediately redirect to processing page
+                window.location.href = 'processing.html';
+                
+                // Save order in background after redirect
+                setTimeout(function() {
+                    // Try to save to Firebase
+                    OrderService.addOrder(adminOrder).catch(function(error) {
+                        console.error('Error saving order:', error);
+                        
+                        // Fallback to localStorage if Firebase fails
+                        let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                        orders.unshift(adminOrder);
+                        localStorage.setItem('orders', JSON.stringify(orders));
+                    });
                     
                     // Add notification
                     const notificationMessage = `New order received: ${purchaseDetails.name} by ${minecraftUsername}`;
@@ -223,20 +234,7 @@
                     let notifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
                     notifications.unshift(newNotification);
                     localStorage.setItem('adminNotifications', JSON.stringify(notifications));
-                    
-                    // Redirect to processing page
-                    window.location.href = 'processing.html';
-                } catch (error) {
-                    console.error('Error saving order:', error);
-                    
-                    // Fallback to localStorage if Firebase fails
-                    let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-                    orders.unshift(adminOrder);
-                    localStorage.setItem('orders', JSON.stringify(orders));
-                    
-                    alert('There was an issue connecting to our server. Your order has been saved locally and will be processed.');
-                    window.location.href = 'processing.html';
-                }
+                }, 100);
             });
         });
     </script>
