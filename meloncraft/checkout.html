@@ -147,9 +147,9 @@
     
     <script>
         // Load purchase details from session storage
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Initialize OrderService
-            await OrderService.init();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize OrderService in background
+            OrderService.init();
             
             const purchaseDetails = JSON.parse(sessionStorage.getItem('purchaseDetails'));
             
