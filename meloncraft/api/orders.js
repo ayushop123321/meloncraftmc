@@ -1,5 +1,8 @@
-// Simple serverless API for order management
-export default function handler(req, res) {
+// Enhanced serverless API for order management
+import { getAllOrders, createOrder, updateOrderStatus, getOrder, removeOrder } from './database.js';
+import { appSettings } from './config.js';
+
+export default async function handler(req, res) {
   try {
     // CORS headers to allow requests from any origin
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -13,29 +16,41 @@ export default function handler(req, res) {
     
     // GET request - retrieve orders
     if (req.method === 'GET') {
-      // Get orders from database (using Vercel KV storage)
-      const orders = process.env.VERCEL_ENV === 'development' 
-        ? JSON.parse(process.env.MOCK_ORDERS || '[]') 
-        : [];
+      const { id } = req.query;
       
-      return res.status(200).json({ success: true, orders });
+      if (id) {
+        // Get specific order
+        const order = await getOrder(id);
+        if (!order) {
+          return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+        return res.status(200).json({ success: true, order });
+      } else {
+        // Get all orders
+        const orders = await getAllOrders();
+        return res.status(200).json({ success: true, orders });
+      }
     }
     
     // POST request - add new order
     if (req.method === 'POST') {
       const order = req.body;
-      
-      // In a real implementation, we would store this in a database
-      // For now, we'll just return success
-      return res.status(201).json({ success: true, message: 'Order created successfully' });
+      const result = await createOrder(order);
+      return res.status(201).json({ success: true, message: 'Order created successfully', orderId: result.id });
     }
     
     // PUT request - update order status
     if (req.method === 'PUT') {
       const { id, status } = req.body;
-      
-      // In a real implementation, we would update the order in a database
+      await updateOrderStatus(id, status);
       return res.status(200).json({ success: true, message: 'Order updated successfully' });
+    }
+    
+    // DELETE request - remove order
+    if (req.method === 'DELETE') {
+      const { id } = req.query;
+      await removeOrder(id);
+      return res.status(200).json({ success: true, message: 'Order deleted successfully' });
     }
     
     // Method not allowed

@@ -1,16 +1,8 @@
 // Order Service - Handles order operations using Firebase Realtime Database
 // This provides a central place for all order-related operations
 
-// Firebase configuration - IMPORTANT: Replace with your own Firebase config in production
-const firebaseConfig = {
-  apiKey: "AIzaSyDYrcJmNxJCsGGgQNMwYI06wkYzIeXjWgM",
-  authDomain: "meloncraft-store.firebaseapp.com",
-  databaseURL: "https://meloncraft-store-default-rtdb.firebaseio.com",
-  projectId: "meloncraft-store",
-  storageBucket: "meloncraft-store.appspot.com",
-  messagingSenderId: "1098476322376",
-  appId: "1:1098476322376:web:3b4a5e1f3d98f5d4a7d3e5"
-};
+// Import configuration from centralized config file
+import { firebaseConfig, appSettings } from './api/config.js';
 
 // Initialize Firebase
 let firebase;

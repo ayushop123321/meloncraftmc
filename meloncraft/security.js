@@ -1,24 +1,14 @@
 // 🛡️ MELONCRAFT - SECURITY PROTECTION
-// Advanced Anti-Theft & Code Protection System v2.0
-// Enhanced Security Implementation
+// Advanced Anti-Theft & Code Protection System v3.0
+// Enhanced Security Implementation with Centralized Configuration
+
+import { securitySettings } from './api/config.js';
 
 (function() {
     'use strict';
     
-    // Security configuration
-    const securityConfig = {
-        enableAntiDevTools: true,
-        enableAntiCopy: true,
-        enableAntiScreenCapture: true,
-        enableAntiSourceView: true,
-        enableAntiInspection: true,
-        enableCodeObfuscation: true,
-        enableTamperDetection: true,
-        redirectOnViolation: 'about:blank',
-        maxViolations: 3,
-        alertTimeout: 3000,
-        checkInterval: 1000
-    };
+    // Security configuration from centralized config
+    const securityConfig = securitySettings;
     
     // Track security violations
     let securityState = {
