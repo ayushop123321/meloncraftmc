@@ -30,11 +30,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Simulate processing time (3 seconds)
-            setTimeout(function() {
-                // Redirect to success page
-                window.location.href = 'success.html';
-            }, 3000);
+            // Redirect to success page immediately
+            window.location.replace('success.html');
             
             // In a real implementation, you would send the order data to your server here
             // const orderDetails = JSON.parse(sessionStorage.getItem('orderDetails'));
