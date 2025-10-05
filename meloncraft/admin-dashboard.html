@@ -289,7 +289,7 @@
             // Initial load
             loadOrders();
 
-            // Load orders from Firebase and localStorage
+            // Load orders from orders.json file
             async function loadOrders() {
                 try {
                     // Show loading indicator
@@ -298,15 +298,21 @@
                         allOrdersTableBody.innerHTML = '<tr><td colspan="7" class="loading">Loading orders...</td></tr>';
                     }
                     
-                    // Get orders from Firebase
-                    const response = await OrderService.getAllOrders();
+                    // Get orders from orders.json file
+                    const response = await fetch('./api/orders.json');
                     
-                    if (response.success && response.orders) {
-                        // Update dashboard with orders
-                        updateDashboard(response.orders);
-                    } else {
-                        throw new Error('Failed to fetch orders');
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch orders: ${response.status}`);
                     }
+                    
+                    const data = await response.json();
+                    const orders = data.orders || [];
+                    
+                    // Update dashboard with orders
+                    updateDashboard(orders);
+                    
+                    // Also store in localStorage as backup
+                    localStorage.setItem('orders', JSON.stringify(orders));
                 } catch (error) {
                     console.error('Error loading orders:', error);
                     
@@ -395,11 +401,42 @@
                         const newStatus = this.value.charAt(0).toUpperCase() + this.value.slice(1);
                         
                         try {
-                            // Update order in Firebase
-                            await OrderService.updateOrder(orderId, { status: newStatus });
+                            // Get current orders
+                            const response = await fetch('./api/orders.json');
+                            if (!response.ok) {
+                                throw new Error(`Failed to fetch orders: ${response.status}`);
+                            }
                             
-                            // Add notification about status change
-                            addNotification(`Order #${orderId} status changed to ${newStatus}`);
+                            const data = await response.json();
+                            const orders = data.orders || [];
+                            
+                            // Find and update the order
+                            const orderIndex = orders.findIndex(order => order.id === orderId);
+                            if (orderIndex !== -1) {
+                                orders[orderIndex].status = newStatus;
+                                orders[orderIndex].updatedAt = new Date().toISOString();
+                                
+                                // Save updated orders
+                                const saveResponse = await fetch('./api/orders.json', {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ orders })
+                                });
+                                
+                                if (!saveResponse.ok) {
+                                    throw new Error(`Failed to save order: ${saveResponse.status}`);
+                                }
+                                
+                                // Update localStorage
+                                localStorage.setItem('orders', JSON.stringify(orders));
+                                
+                                // Add notification about status change
+                                addNotification(`Order #${orderId} status changed to ${newStatus}`);
+                            } else {
+                                throw new Error('Order not found');
+                            }
                         } catch (error) {
                             console.error('Error updating order status:', error);
                             addNotification(`Failed to update order #${orderId} status. Please try again.`);
@@ -519,23 +556,47 @@
             }
 
             // Check for new orders every 10 seconds
-            function checkForNewOrders() {
-                const lastCheck = localStorage.getItem('lastOrderCheck') || '0';
-                const orders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
-                
-                if (orders.length > 0) {
-                    const latestOrderTime = new Date(orders[0].timestamp || 0).getTime();
+            async function checkForNewOrders() {
+                try {
+                    // Get orders from orders.json file
+                    const response = await fetch('./api/orders.json');
                     
-                    if (latestOrderTime > parseInt(lastCheck)) {
-                        // New order found
-                        addNotification(`New order received: ${orders[0].id}`);
-                        localStorage.setItem('lastOrderCheck', latestOrderTime.toString());
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch orders: ${response.status}`);
                     }
-                }
-                
-                // Initial check
-                if (lastCheck === '0' && orders.length > 0) {
-                    localStorage.setItem('lastOrderCheck', Date.now().toString());
+                    
+                    const data = await response.json();
+                    const orders = data.orders || [];
+                    
+                    // Get last checked timestamp
+                    const lastChecked = localStorage.getItem('lastOrderCheck') || 0;
+                    
+                    // Check for new orders
+                    const newOrders = orders.filter(order => {
+                        const orderDate = new Date(order.createdAt).getTime();
+                        return orderDate > lastChecked;
+                    });
+                    
+                    // Update last checked timestamp
+                    localStorage.setItem('lastOrderCheck', Date.now());
+                    
+                    // Notify about new orders
+                    if (newOrders.length > 0) {
+                        // Play sound if enabled
+                        const notificationSettings = JSON.parse(localStorage.getItem('adminNotificationSettings') || '{"enableSound":true}');
+                        if (notificationSettings.enableSound) {
+                            const audio = new Audio('./assets/notification.mp3');
+                            audio.play();
+                        }
+                        
+                        // Add notification
+                        addNotification(`${newOrders.length} new order(s) received!`);
+                        
+                        // Refresh orders
+                        loadOrders();
+                    }
+                } catch (error) {
+                    console.error('Error checking for new orders:', error);
                 }
             }
 
@@ -590,28 +651,37 @@
             });
             
             // Load all orders for the orders page
-            function loadAllOrders() {
-                const orders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
-                const allOrdersTableBody = document.getElementById('all-orders-table-body');
-                
-                // Clear table
-                allOrdersTableBody.innerHTML = '';
-                
-                if (orders.length === 0) {
-                    const emptyRow = document.createElement('tr');
-                    emptyRow.innerHTML = `
-                        <td colspan="7" class="empty-table">No orders found</td>
-                    `;
-                    allOrdersTableBody.appendChild(emptyRow);
-                    return;
+            async function loadAllOrders() {
+                try {
+                    // Show loading indicator
+                    allOrdersTableBody.innerHTML = '<tr><td colspan="7" class="loading">Loading orders...</td></tr>';
+                    
+                    // Get orders from orders.json file
+                    const response = await fetch('./api/orders.json');
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch orders: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    const orders = data.orders || [];
+                    
+                    // Update localStorage
+                    localStorage.setItem('orders', JSON.stringify(orders));
+                    
+                    // Update orders table
+                    updateOrdersTable(allOrdersTableBody, orders);
+                } catch (error) {
+                    console.error('Error loading orders:', error);
+                    
+                    // Fallback to localStorage
+                    const localOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+                    updateOrdersTable(allOrdersTableBody, localOrders);
+                    
+                    // Show error message
+                    addNotification('Failed to load orders from server. Showing local data.');
                 }
-                
-                // Add orders to table
-                orders.forEach(order => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${order.id}</td>
-                        <td>${order.date}</td>
+            }
                         <td>${order.customer}</td>
                         <td>${order.item}</td>
                         <td>${order.amount}</td>
